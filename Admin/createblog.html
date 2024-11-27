@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blog Creation Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100">
+
+    <div class="max-w-xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
+      <h1 class="text-3xl font-bold text-gray-900 mb-4 text-center">Create a New Blog</h1>
+
+      <!-- Blog Creation Form -->
+      <form class="space-y-4" id="blogForm">
+        <!-- Blog Title -->
+        <div>
+          <label for="title" class="block text-lg font-medium text-gray-700">Blog Title</label>
+          <input 
+            type="text" 
+            id="title" 
+            name="title" 
+            placeholder="Enter blog title" 
+            required
+            class="mt-1 p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <!-- Author -->
+        <div>
+          <label for="author" class="block text-lg font-medium text-gray-700">Author</label>
+          <input 
+            type="text" 
+            id="author" 
+            name="author" 
+            placeholder="Enter your name" 
+            required
+            class="mt-1 p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label for="description" class="block text-lg font-medium text-gray-700">Description</label>
+          <textarea 
+            id="description" 
+            name="description" 
+            placeholder="Write a brief description of the blog" 
+            required
+            rows="3"
+            class="mt-1 p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          ></textarea>
+        </div>
+
+        <!-- Is Published -->
+        <div>
+          <label for="isPublished" class="block text-lg font-medium text-gray-700">Is Published?</label>
+          <select 
+            id="isPublished" 
+            name="isPublished" 
+            class="mt-1 p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          >
+            <option value="Published">Published</option>
+            <option value="Not Published">Not Published</option>
+          </select>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center">
+          <button 
+            type="submit" 
+            class="px-6 py-2 bg-blue-500 text-white font-semibold text-lg rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            Timestamp
+        } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+      
+        const firebaseConfig = {
+          apiKey: "AIzaSyA5LHVZsitBDFbNS1nk7IkCHj9JQvnODJQ",
+          authDomain: "blog1-2cbca.firebaseapp.com",
+          projectId: "blog1-2cbca",
+          storageBucket: "blog1-2cbca.firebasestorage.app",
+          messagingSenderId: "905052643661",
+          appId: "1:905052643661:web:bff4e4b67a332d9fffd704"
+        };
+      
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const colRef = collection(db, "blogs");
+    
+        document.getElementById("blogForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            const title = blogForm.title.value;
+            const desc = blogForm.description.value;
+            const author = blogForm.author.value;
+            const isPublished = blogForm.isPublished.value;
+            const postedAt = Timestamp.now() 
+            
+        
+            const dataToSend = {
+                title,
+                desc,
+                author,
+                isPublished,
+                postedAt
+            };
+            const submitButton = document.querySelector("button[type='submit']");
+            submitButton.innerHTML = "Loading...";
+            // submitButton.style.color = "green";
+            submitButton.style.background = "green";
+    
+            try {
+
+                const res = await addDoc(colRef, dataToSend);
+                // console.log("Document added:",dataToSend);
+                submitButton.innerHTML = "Submit";
+                blogForm.reset();
+                alert("Blog posted successfully!");
+                window.location.href = "./adminindex.html";
+            } catch (error) {
+                console.error("Error adding document:", error);
+                submitButton.innerHTML = "Submit";
+            alert("Failed to post the blog. Please try again.");
+            }
+        });
+    </script>
+    
+
+  </body>
+</html>

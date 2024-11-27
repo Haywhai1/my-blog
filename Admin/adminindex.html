@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+     
+      .lds-roller,
+      .lds-roller div,
+      .lds-roller div:after {
+        box-sizing: border-box;
+        color: black;
+      }
+      .lds-roller {
+        display: inline-block;
+        position: relative;
+        width: 80px;
+        height: 80px;
+        margin-left: 45%;
+        margin-top: 10%;
+      }
+      .lds-roller div {
+        animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        transform-origin: 40px 40px;
+      }
+      .lds-roller div:after {
+        content: " ";
+        display: block;
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: currentColor;
+        margin: -3.6px 0 0 -3.6px;
+      }
+      .lds-roller div:nth-child(1) {
+        animation-delay: -0.036s;
+      }
+      .lds-roller div:nth-child(1):after {
+        top: 62.62742px;
+        left: 62.62742px;
+      }
+      .lds-roller div:nth-child(2) {
+        animation-delay: -0.072s;
+      }
+      .lds-roller div:nth-child(2):after {
+        top: 67.71281px;
+        left: 56px;
+      }
+      .lds-roller div:nth-child(3) {
+        animation-delay: -0.108s;
+      }
+      .lds-roller div:nth-child(3):after {
+        top: 70.90963px;
+        left: 48.28221px;
+      }
+      .lds-roller div:nth-child(4) {
+        animation-delay: -0.144s;
+      }
+      .lds-roller div:nth-child(4):after {
+        top: 72px;
+        left: 40px;
+      }
+      .lds-roller div:nth-child(5) {
+        animation-delay: -0.18s;
+      }
+      .lds-roller div:nth-child(5):after {
+        top: 70.90963px;
+        left: 31.71779px;
+      }
+      .lds-roller div:nth-child(6) {
+        animation-delay: -0.216s;
+      }
+      .lds-roller div:nth-child(6):after {
+        top: 67.71281px;
+        left: 24px;
+      }
+      .lds-roller div:nth-child(7) {
+        animation-delay: -0.252s;
+      }
+      .lds-roller div:nth-child(7):after {
+        top: 62.62742px;
+        left: 17.37258px;
+      }
+      .lds-roller div:nth-child(8) {
+        animation-delay: -0.288s;
+      }
+      .lds-roller div:nth-child(8):after {
+        top: 56px;
+        left: 12.28719px;
+      }
+      @keyframes lds-roller {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      #showloading {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+ <div class=" bg-green-500">
+    <div class="text-right mt-4 mr-4 pt-4"> 
+        <a href="./createblog.html">
+            <button 
+                type="button"
+                class="px-2 py-1 bg-white text-black font-semibold text-lg rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+                Create Blog
+            </button>
+        </a>
+    </div>
+     <h1
+      class="text-6xl font-extrabold text-white text-center mb-3 pt-1 pb-4 drop-shadow-lg"
+    >
+      Haywhai's Blog Admin
+    </h1>
+    
+ </div>
+
+    <section style="display: flex">
+      <div class="lds-roller" id="showloading">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+      <div id="leftdiv" class="w-[19%] hidden md:block"></div>
+      <div id="display" class="w-[61%] mx-auto"></div>
+      <div id="rightdiv" class="w-[19%] hidden md:block"></div>
+    </section>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        getDocs,
+      } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyA5LHVZsitBDFbNS1nk7IkCHj9JQvnODJQ",
+        authDomain: "blog1-2cbca.firebaseapp.com",
+        projectId: "blog1-2cbca",
+        storageBucket: "blog1-2cbca.firebasestorage.app",
+        messagingSenderId: "905052643661",
+        appId: "1:905052643661:web:bff4e4b67a332d9fffd704",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      async function getAllBlogs() {
+        const colRef = collection(db, "blogs");
+        try {
+          showloading.style.display = "block";
+          const res = await getDocs(colRef);
+
+          res.docs.forEach((elem) => {
+            const blog = { ...elem.data(), id: elem.id };
+            const postedAt = blog.postedAt;
+            console.log(blog);
+
+            const postedTimeMillis =
+              postedAt.seconds * 1000 + postedAt.nanoseconds / 1000000;
+
+            const formattedDate = new Date(postedTimeMillis).toLocaleString(
+              "en-US",
+              {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+                second: "numeric",
+                hour12: true,
+              }
+            );
+
+            const currentTime = Date.now();
+
+            // Calculate the difference between the current time and the posted time
+            const timeDifference = currentTime - postedTimeMillis;
+            const twoDaysInMillis = 24 * 60 * 60 * 1000; // 2 days in milliseconds
+
+            // Check if the blog was posted within the last 2 days
+            const isNewBlog = timeDifference <= twoDaysInMillis;
+
+            const displayContainer = document.querySelector("#display"); // Assuming you have an element with id="display"
+
+            // Create a new div for the blog content
+            const blogDiv = document.createElement("div");
+            blogDiv.classList.add(
+              "bg-white",
+              "p-6",
+              "rounded-lg",
+              "shadow-lg",
+              "space-y-4",
+              "max-w-5xl",
+              "mx-auto",
+              "mb-1",
+              "relative"
+            );
+
+            if (isNewBlog) {
+              // Create a circular notification div for new posts
+              const newBlogDiv = document.createElement("div");
+              newBlogDiv.classList.add(
+                "bg-green-500",
+                "text-white",
+                "w-8",
+                "h-8",
+                "rounded-full",
+                "flex",
+                "items-center",
+                "justify-center",
+                "text-xs",
+                "font-bold",
+                "absolute",
+                "top-4",
+                "right-4",
+                "shadow-lg"
+              );
+              newBlogDiv.textContent = "New";
+              blogDiv.appendChild(newBlogDiv); // Append the circular notification to the blog div
+            }
+
+            // Add the blog details as innerHTML after the notification
+            blogDiv.innerHTML += `
+              <h1 class="text-3xl font-bold text-gray-900"><a href='./editingblog.html?id=${
+                blog.id
+              }'>${blog.title}</a></h1>
+              <p class="text-lg text-gray-700">
+  ${blog.desc.length > 100 ? blog.desc.substring(0, 80) + "..." : blog.desc}
+</p>
+
+              <p class="text-sm text-gray-500">${
+                blog.ispublish ? "Published" : "Not Published"
+              }</p>
+              <p class="text-sm text-gray-500">PostedAt: ${formattedDate}</p>
+              <div class="flex items-center space-x-2">
+                <span class="text-sm font-medium text-gray-700">PostedBy:</span>
+                <span class="text-sm text-gray-900 font-semibold">${
+                  blog.author
+                }</span>
+              </div>
+            `;
+
+            // Append the entire blog div to the display container
+            displayContainer.appendChild(blogDiv);
+          });
+
+          leftdiv.innerHTML = `
+          <div class="bg-white  h-[500px] "></div>
+          `;
+
+          rightdiv.innerHTML = `
+          <div class="bg-white  h-[500px] "></div>
+          `;
+        } catch (error) {
+          console.log(error);
+        } finally {
+          showloading.style.display = "none";
+        }
+      } 
+
+      getAllBlogs();
+    </script>
+  </body>
+</html>
